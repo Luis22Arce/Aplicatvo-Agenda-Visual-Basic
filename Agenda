@@ -1,0 +1,77 @@
+Private Sub cmdAdd_Click()
+  Data1.Recordset.AddNew
+End Sub
+
+Private Sub cmdDelete_Click()
+  'esto puede producir un error si elimina el último
+  'registro o el único registro del recordset
+  Data1.Recordset.Delete
+  Data1.Recordset.MoveNext
+End Sub
+
+Private Sub cmdRefresh_Click()
+  'esto sólo es necesario para aplicaciones multiusuario
+  Data1.Refresh
+End Sub
+
+Private Sub cmdUpdate_Click()
+  Data1.UpdateRecord
+  Data1.Recordset.Bookmark = Data1.Recordset.LastModified
+End Sub
+
+Private Sub cmdClose_Click()
+  Unload Me
+End Sub
+
+Private Sub Command1_Click()
+If Data1.Recordset.EOF = True Then
+Data1.Recordset.MoveLast
+Else
+Data1.Recordset.MoveNext
+End If
+End Sub
+
+Private Sub Command2_Click()
+If Data1.Recordset.BOF = True Then
+Data1.Recordset.MoveFirst
+Else
+Data1.Recordset.MovePrevious
+End If
+End Sub
+
+Private Sub Data1_Error(DataErr As Integer, Response As Integer)
+  'Aquí es donde se coloca el código de control de errores
+  'Si quiere ignorar los errores, marque como comentario la línea siguiente
+  'Si desea detectarlos, agregue código aquí para controlarlos
+  MsgBox "El error de datos alcanzó err:" & Error$(DataErr)
+  Response = 0  'ignorar el error
+End Sub
+
+Private Sub Data1_Reposition()
+  Screen.MousePointer = vbDefault
+  On Error Resume Next
+  'Esto mostrará la posición del registro actual
+  'para dynasets y snapshots
+  Data1.Caption = "Record: " & (Data1.Recordset.AbsolutePosition + 1)
+  'para el objeto tabla debe establecer la propiedad index cuando
+  'se crea el recordset; use la línea siguiente
+  'Data1.Caption = "Record: " & (Data1.Recordset.RecordCount * (Data1.Recordset.PercentPosition * 0.01)) + 1
+End Sub
+
+Private Sub Data1_Validate(Action As Integer, Save As Integer)
+  'Aquí es donde se coloca el código de validación
+  'Se llama a este evento cuando se produce la siguiente acción
+  Select Case Action
+    Case vbDataActionMoveFirst
+    Case vbDataActionMovePrevious
+    Case vbDataActionMoveNext
+    Case vbDataActionMoveLast
+    Case vbDataActionAddNew
+    Case vbDataActionUpdate
+    Case vbDataActionDelete
+    Case vbDataActionFind
+    Case vbDataActionBookmark
+    Case vbDataActionClose
+  End Select
+  Screen.MousePointer = vbHourglass
+End Sub
